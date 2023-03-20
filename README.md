@@ -1,7 +1,6 @@
 # calculator
 
-## Web demo
-[VSCode](https://pabcrudel.github.io/calculator/)
+## [Web demo](https://pabcrudel.github.io/calculator/)
 
 This template should help get you started developing with Vue 3 in Vite.
 
