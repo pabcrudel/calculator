@@ -42,12 +42,13 @@ export const useCalculator = defineStore('Calculator', {
         setOperation(item){
             this.current.operation === "0" ? this.current.operation = item : this.current.operation += item;
 
+            // Clear last operator
             this.last.operator = "";
 
-            this.calc(this.current.operation)
+            this.calc(this.current.operation);
         },
         calc(operation){
-            this.current.result = `${eval(operation)}`
+            this.current.result = `${eval(operation)}`;
         },
         backspace(){
             const opLength = this.current.operation.length;
@@ -89,6 +90,7 @@ export const useCalculator = defineStore('Calculator', {
                 item :
                 ` ${item} `;
     
+                // Set last operator
                 this.last.operator = item;
             };
         },
