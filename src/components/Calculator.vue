@@ -39,7 +39,7 @@ const {last, current, saveOperation} = storeToRefs(useCalculator());
 
 <style>
 #calculator {
-  width: clamp(35%, 450px, 100%);
+  width: clamp(25%, 450px, 100%);
   margin: auto;
   background-color: #fff;
   display: grid;
