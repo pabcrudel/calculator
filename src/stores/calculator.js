@@ -42,13 +42,15 @@ export const useCalculator = defineStore('Calculator', {
         setOperation(item){
             this.current.operation === "0" ? this.current.operation = item : this.current.operation += item;
 
-            // Clear last operator
-            this.lastOperator = "";
+            this.clearLastOperator(item);
 
             this.calc(this.current.operation);
         },
         setLastOperator(item){
             this.lastOperator = item;
+        },
+        clearLastOperator(item){
+            if (this.lastOperator != ".") this.lastOperator = "";
         },
         calc(operation){
             this.current.result = `${eval(operation)}`;
