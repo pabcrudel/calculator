@@ -28,7 +28,7 @@ export const useCalculator = defineStore('Calculator', {
                     this.backspace()
                     break;
                 case item === "C":
-                    this.$reset()
+                    this.clear(item)
                     break;
                 case item === "=":
                     this.setBuffer()
@@ -47,6 +47,9 @@ export const useCalculator = defineStore('Calculator', {
 
             this.calc(this.current.operation);
         },
+        setLastOperator(item){
+            this.lastOperator = item;
+        },
         calc(operation){
             this.current.result = `${eval(operation)}`;
         },
@@ -64,9 +67,15 @@ export const useCalculator = defineStore('Calculator', {
                 this.calc(this.last.operation)
             }
         },
-        // clear(item){
+        clear(item){
+            if (this.lastOperator === item) this.$reset()
+            else {
+                this.current.operation = "0";
+                this.current.result = "0";
 
-        // },
+                this.setLastOperator(item)
+            }
+        },
         setBuffer(){
             this.buffer.operation = this.current.operation;
             this.buffer.result = this.current.result;
@@ -90,8 +99,7 @@ export const useCalculator = defineStore('Calculator', {
                 item :
                 ` ${item} `;
     
-                // Set last operator
-                this.lastOperator = item;
+                this.setLastOperator(item)
             };
         },
     },
