@@ -21,6 +21,7 @@ export const useCalculator = defineStore('Calculator', {
             /* Checking if the item is a number. If it is, it adds it to the number. */
             if (!isNaN(item)) {
                 this.current.operation === "0" ? this.current.operation = item : this.current.operation += item;
+                
                 this.current.result = eval(this.current.operation)
             }
             /* Checking if the item is backspace and if the number has something. If it is, it will slice the number. */
@@ -62,7 +63,10 @@ export const useCalculator = defineStore('Calculator', {
                     this.current.operation = this.current.result;
                 }
 
-                this.current.operation += ` ${item} `;
+                this.current.operation += 
+                item === "." ?
+                item :
+                ` ${item} `;
             };
         }
     },
