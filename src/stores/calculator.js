@@ -8,7 +8,6 @@ export const useCalculator = defineStore('Calculator', {
         },
         last: {
             operation: "0",
-            operator: "",
             result: "0"
         },
         buffer: {
@@ -16,6 +15,7 @@ export const useCalculator = defineStore('Calculator', {
             result: "0"
         },
         isSaved: false,
+        lastOperator: ""
     }),
     actions: {
         handleInput(item){
@@ -43,7 +43,7 @@ export const useCalculator = defineStore('Calculator', {
             this.current.operation === "0" ? this.current.operation = item : this.current.operation += item;
 
             // Clear last operator
-            this.last.operator = "";
+            this.lastOperator = "";
 
             this.calc(this.current.operation);
         },
@@ -84,14 +84,14 @@ export const useCalculator = defineStore('Calculator', {
             };
         },
         updateOperation(item){
-            if (this.last.operator != item) {
+            if (this.lastOperator != item) {
                 this.current.operation += 
                 item === "." ?
                 item :
                 ` ${item} `;
     
                 // Set last operator
-                this.last.operator = item;
+                this.lastOperator = item;
             };
         },
     },
