@@ -1,5 +1,5 @@
 <template>
-  <button class="myButton" :class="{'material-symbols-outlined': item === 'backspace'}" v-html="item" @click="useCalculator().sendItem(item)"/>
+  <button class="myButton" :class="{'material-symbols-outlined': item === 'backspace'}" v-html="item" @click="useCalculator().handleInput(item)"/>
 </template>
 
 <script setup>
