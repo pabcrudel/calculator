@@ -15,10 +15,17 @@ export const useCalculator = defineStore('Calculator', {
             result: "0"
         },
         isSaved: false,
+        hasError: false,
         lastOperator: ""
     }),
     actions: {
         handleInput(item){
+            if (this.hasError) {
+                this.clear();
+
+                this.hasError = false;
+            };
+
             switch (true) {
                 case /^\d+(\.\d+)?$/.test(item):
                     this.setOperation(item)
@@ -42,14 +49,21 @@ export const useCalculator = defineStore('Calculator', {
         setOperation(item){
             this.current.operation === "0" ? this.current.operation = item : this.current.operation += item;
 
-            this.clearLastOperator(item);
+            if (this.lastOperator === "/" && item === "0") {
+                this.current.result = "No se puede dividir por cero";
 
-            this.calc(this.current.operation);
+                this.hasError = true;
+            }
+            else {
+                this.calc(this.current.operation);
+
+                this.clearLastOperator();
+            };
         },
         setLastOperator(item){
             this.lastOperator = item;
         },
-        clearLastOperator(item){
+        clearLastOperator(){
             if (this.lastOperator != ".") this.lastOperator = "";
         },
         calc(operation){
