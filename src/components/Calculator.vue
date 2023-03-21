@@ -2,8 +2,12 @@
   <section id="calculator">
     <div id="results">
       <div id="previous">
-        <p v-html="last.operation"/>
-        <p v-html="`= ${last.result}`"/>  
+        <!-- <p v-html="last.operation"/>
+        <p v-html="`= ${last.result}`"/> -->
+        <template v-for="lastResult in lastArray">
+          <p v-html="lastResult.operation"/>
+          <p v-html="`= ${lastResult.result}`"/>
+        </template>
       </div>
       <div id="current">
         <p :class="{focus:!saveOperation}" v-html="current.operation"/>
@@ -19,6 +23,9 @@
         <MyButton v-for="control in basicOperators" :item="control"/>
       </div>
     </div>
+    <!-- <div id="calcPad">
+      <MyButton v-for="control in calcButtons" :item="control"/>
+    </div> -->
   </section>
 </template>
 
@@ -31,10 +38,18 @@ import MyButton from './MyButton.vue';
 import {useCalculator} from '@/stores/calculator';
 import { storeToRefs } from 'pinia';
 
+const calcButtons = [
+  'C', 'backspace', '%', '/',
+  '7', '8', '9', '*',
+  '4', '5', '6', '-',
+  '1', '2', '3', '+',
+  '0', '.', '='
+]
+
 const specialOperators = ['C', 'backspace', '%']
 const basicOperators = ['/', '*', '-', '+', '=']
 
-const {last, current, saveOperation} = storeToRefs(useCalculator());
+const {last, lastArray, current, saveOperation} = storeToRefs(useCalculator());
 </script>
 
 <style>

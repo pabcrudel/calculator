@@ -12,5 +12,10 @@ defineProps({
 </script>
 
 <style scoped>
-button {font-size: 1.75rem;}
+button {
+  font-size: 1.75rem;
+  /* border-radius: 50%;
+  width: 50px;
+  height: 50px; */
+}
 </style>
