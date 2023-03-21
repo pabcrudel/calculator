@@ -17,7 +17,6 @@ import Calculator from './components/Calculator.vue';
 
 body {
   margin: 0;
-  min-height: 100vh;
   background: #2c3e50;
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
