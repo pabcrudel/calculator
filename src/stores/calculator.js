@@ -105,8 +105,8 @@ export const useCalculator = defineStore('Calculator', {
                     this.setBuffer(this.lastInput != "." ? this.getLastChar(3) : this.getLastChar(2));
                 }
 
-                console.log(this.lastInput)
-                // this.calc(this.lastOperation);
+                if (/[+\-*/%.]/.test(this.lastInput)) this.calc(this.current.operation);
+                else this.calc(this.current.operation.slice(0, -3));
             };
         },
         getLastChar(position){
