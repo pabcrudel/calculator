@@ -14,15 +14,14 @@ class OperationState {
         this.operation === "0" ? this.operation = item : this.operation += item;
     };
 
-    getLength(){
-        return this.operation.length;
+    sliceOperation(position) {
+        this.operation = this.operation.slice(0, - position);
     };
 };
 
 export const useCalculator = defineStore('Calculator', {
     state: () => ({
         current: new OperationState,
-        // last: new OperationState,
         lastOperation: "0",
         lastArray: [],
         hasError: false,
@@ -80,37 +79,30 @@ export const useCalculator = defineStore('Calculator', {
         setLastInput(item){
             this.lastInput = item;
         },
-        setBuffer(operation){
+        setBuffer(position){
             this.lastOperation = 
-            operation != undefined ? 
-            operation :
+            position != undefined ? 
+            this.current.operation.slice(0, - position) :
             this.current.operation;
         },
         calc(operation){
             this.current.result = `${eval(operation)}`;
         },
         backspace(){
-            if (this.current.getLength() <= 1) this.current.reset();
+            const length = this.current.operation.length;
+
+            if (length <= 1) this.current.reset();
             else {
-                if (this.getLastChar(1) === " ") {
-                    this.setLastInput(this.getLastChar(2))
-                    
-                    this.current.operation = this.current.operation.slice(0, -3)
-                }
+                if (this.current.operation.charAt(length - 1) === " ") {
+                    this.current.sliceOperation(3);
+                    this.setBuffer();
+                } 
                 else {
-                    this.setLastInput(this.getLastChar(1))
-
-                    this.current.operation = this.current.operation.slice(0, -1)
-
-                    this.setBuffer(this.lastInput != "." ? this.getLastChar(3) : this.getLastChar(2));
-                }
-
-                if (/[+\-*/%.]/.test(this.lastInput)) this.calc(this.current.operation);
-                else this.calc(this.current.operation.slice(0, -3));
+                    this.current.sliceOperation(1);
+                    this.setBuffer(2);
+                };
+                this.calc(this.lastOperation);
             };
-        },
-        getLastChar(position){
-            return this.current.operation.charAt(this.current.getLength() - position);
         },
         clear(item){
             if (this.lastInput === item) this.$reset()
