@@ -27,7 +27,8 @@ export const useCalculator = defineStore('Calculator', {
         lastArray: [],
         hasError: false,
         isFinished: false,
-        lastOperator: ""
+        isOperator: false,
+        lastInput: "",
     }),
     actions: {
         handleInput(item){
@@ -47,7 +48,7 @@ export const useCalculator = defineStore('Calculator', {
                 case item === "C":
                     this.clear(item)
                     break;
-                case item === "=" && isNaN(this.current.operation):
+                case item === "=" && !this.isOperator:
                     this.isFinished = true;
                     break;
                 case /[+\-*/%.]/.test(item):
@@ -55,7 +56,8 @@ export const useCalculator = defineStore('Calculator', {
                     break;
             };
 
-            this.setLastOperator(item)
+            this.setLastInput(item);
+            this.isOperator = isNaN(item);
         },
         setOperation(item){
             if (this.isFinished) {
@@ -65,7 +67,7 @@ export const useCalculator = defineStore('Calculator', {
 
             this.current.setOperation(item);
 
-            if (this.lastOperator === "/" && item === "0") {
+            if (this.lastInput === "/" && item === "0") {
                 this.current.result = "No se puede dividir por cero";
 
                 this.hasError = true;
@@ -75,8 +77,14 @@ export const useCalculator = defineStore('Calculator', {
                 this.calc(this.current.operation)
             };
         },
-        setLastOperator(item){
-            this.lastOperator = item;
+        setLastInput(item){
+            this.lastInput = item;
+        },
+        setBuffer(operation){
+            this.lastOperation = 
+            operation != undefined ? 
+            operation :
+            this.current.operation;
         },
         calc(operation){
             this.current.result = `${eval(operation)}`;
@@ -85,19 +93,19 @@ export const useCalculator = defineStore('Calculator', {
             if (this.current.getLength() <= 1) this.current.reset();
             else {
                 if (this.getLastChar(1) === " ") {
-                    this.setLastOperator(this.getLastChar(2))
+                    this.setLastInput(this.getLastChar(2))
                     
                     this.current.operation = this.current.operation.slice(0, -3)
                 }
                 else {
-                    this.setLastOperator(this.getLastChar(1))
+                    this.setLastInput(this.getLastChar(1))
 
                     this.current.operation = this.current.operation.slice(0, -1)
 
-                    this.setBuffer(this.lastOperator != "." ? this.getLastChar(3) : this.getLastChar(2));
+                    this.setBuffer(this.lastInput != "." ? this.getLastChar(3) : this.getLastChar(2));
                 }
 
-                console.log(this.lastOperator)
+                console.log(this.lastInput)
                 // this.calc(this.lastOperation);
             };
         },
@@ -105,16 +113,10 @@ export const useCalculator = defineStore('Calculator', {
             return this.current.operation.charAt(this.current.getLength() - position);
         },
         clear(item){
-            if (this.lastOperator === item) this.$reset()
+            if (this.lastInput === item) this.$reset()
             else {
                 this.current.reset();
             }
-        },
-        setBuffer(operation){
-            this.lastOperation = 
-            operation != undefined ? 
-            operation :
-            this.current.operation;
         },
         saveOperation(){
             this.lastArray.push({
@@ -125,7 +127,7 @@ export const useCalculator = defineStore('Calculator', {
             this.current.operation = this.current.result;
         },
         updateOperation(item){
-            if (this.lastOperator != item) {
+            if (this.lastInput != item) {
                 if (this.isFinished) this.isFinished = false;
 
                 this.current.operation = this.lastOperation;
@@ -135,6 +137,6 @@ export const useCalculator = defineStore('Calculator', {
                 item :
                 ` ${item} `;
             };
-        },
+        }
     },
 })
