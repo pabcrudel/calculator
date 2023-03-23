@@ -1,19 +1,35 @@
 import { defineStore } from 'pinia';
 
 class OperationState {
+//  Constructors
     constructor() {
         this.reset();
     };
 
-    reset() {
-        this.operation = "0";
-        this.result = "0";
+//  Getters
+    getOperation() {
+        return this.operation;
     };
 
+    getOperationLength() {
+        return this.operation.length;
+    };
+
+    getCharacterFromBehind(position) {
+        return this.operation.charAt(this.getOperationLength() - position);
+    };
+
+//  Setters
     setOperation(item) {
         this.operation === "0" ? this.operation = item : this.operation += item;
     };
 
+//  Methods
+    reset() {
+        this.operation = "0";
+        this.result = "0";
+    };
+    
     sliceOperation(position) {
         this.operation = this.operation.slice(0, - position);
     };
@@ -39,24 +55,25 @@ export const useCalculator = defineStore('Calculator', {
 
             switch (true) {
                 case /^\d+(\.\d+)?$/.test(item):
-                    this.setOperation(item)
+                    this.setOperation(item);
+                    this.setLastInput(item);
                     break;
                 case item === "backspace":
-                    this.backspace()
+                    this.backspace();
                     break;
                 case item === "C":
-                    this.clear(item)
+                    this.clear(item);
+                    this.setLastInput(item);
                     break;
                 case item === "=" && !this.isOperator:
                     this.isFinished = true;
+                    this.setLastInput(item);
                     break;
                 case /[+\-*/%.]/.test(item):
-                    this.updateOperation(item)
+                    this.updateOperation(item);
+                    this.setLastInput(item);
                     break;
             };
-
-            this.setLastInput(item);
-            this.isOperator = isNaN(item);
         },
         setOperation(item){
             if (this.isFinished) {
@@ -73,36 +90,41 @@ export const useCalculator = defineStore('Calculator', {
             }
             else {
                 this.setBuffer();
-                this.calc(this.current.operation)
+                this.calc(this.current.operation);
             };
+        },
+        calc(operation){
+            this.current.result = `${eval(operation)}`;
         },
         setLastInput(item){
             this.lastInput = item;
+            this.isOperator = isNaN(item);
         },
         setBuffer(position){
             this.lastOperation = 
             position != undefined ? 
             this.current.operation.slice(0, - position) :
-            this.current.operation;
-        },
-        calc(operation){
-            this.current.result = `${eval(operation)}`;
+            this.current.getOperation();
         },
         backspace(){
-            const length = this.current.operation.length;
+            const length = this.current.getOperationLength();
+            const lastChar = this.current.getCharacterFromBehind(1);
 
             if (length <= 1) this.current.reset();
             else {
-                if (this.current.operation.charAt(length - 1) === " ") {
-                    this.current.sliceOperation(3);
-                    this.setBuffer();
-                } 
+                if (lastChar === " ") this.deleteOperator();
                 else {
                     this.current.sliceOperation(1);
-                    this.setBuffer(2);
-                };
-                this.calc(this.lastOperation);
+
+                    if (this.current.getCharacterFromBehind(1) === ".") this.current.sliceOperation(1);
+                    else if (this.current.getCharacterFromBehind(1) === " ") this.deleteOperator();
+                }
+                this.calc(this.current.operation);
             };
+        },
+        deleteOperator() {
+            this.setLastInput(this.current.getCharacterFromBehind(2));
+            this.current.sliceOperation(3);
         },
         clear(item){
             if (this.lastInput === item) this.$reset()
