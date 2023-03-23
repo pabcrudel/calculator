@@ -43,6 +43,7 @@ export const useCalculator = defineStore('Calculator', {
         hasError: false,
         isFinished: false,
         isOperator: false,
+        isDecimal: false,
         lastInput: "",
     }),
     actions: {
@@ -72,6 +73,7 @@ export const useCalculator = defineStore('Calculator', {
                 case /[+\-*/%.]/.test(item):
                     this.updateOperation(item);
                     this.setLastInput(item);
+                    // this.isDecimal = item === ".";
                     break;
             };
         },
@@ -88,12 +90,10 @@ export const useCalculator = defineStore('Calculator', {
 
                 this.hasError = true;
             }
-            else {
-                this.setBuffer();
-                this.calc(this.current.operation);
-            };
+            else this.calc(this.current.operation);
         },
         calc(operation){
+            this.setBuffer();
             this.current.result = `${eval(operation)}`;
         },
         setLastInput(item){
@@ -110,7 +110,10 @@ export const useCalculator = defineStore('Calculator', {
             const length = this.current.getOperationLength();
             const lastChar = this.current.getCharacterFromBehind(1);
 
-            if (length <= 1) this.current.reset();
+            if (length <= 1) {
+                this.current.reset();
+                this.setBuffer();
+            }
             else {
                 if (lastChar === " ") this.deleteOperator();
                 else {
@@ -118,12 +121,12 @@ export const useCalculator = defineStore('Calculator', {
 
                     if (this.current.getCharacterFromBehind(1) === ".") this.current.sliceOperation(1);
                     else if (this.current.getCharacterFromBehind(1) === " ") this.deleteOperator();
-                }
+                };
                 this.calc(this.current.operation);
             };
+            this.setLastInput(this.current.getCharacterFromBehind(1));
         },
         deleteOperator() {
-            this.setLastInput(this.current.getCharacterFromBehind(2));
             this.current.sliceOperation(3);
         },
         clear(item){
@@ -145,6 +148,13 @@ export const useCalculator = defineStore('Calculator', {
                 if (this.isFinished) this.isFinished = false;
 
                 this.current.operation = this.lastOperation;
+
+                // console.log(isNaN(this.lastInput))
+                // if (item != ".") {
+                //     this.current.operation += ` ${item} `;
+                // } else if (!this.isDecimal && !/[+\-*/%]/.test(this.lastInput)) {
+                //     this.current.operation += item;
+                // }
 
                 this.current.operation += 
                 item === "." ?
