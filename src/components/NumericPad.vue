@@ -23,8 +23,6 @@ const numOrder = ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0']
 }
 #numericPad >:last-child {
     grid-row-start: 4;
-}
-#numericPad >:nth-last-child(1) {
     grid-column: span 3;
 }
 </style>
