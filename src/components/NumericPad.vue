@@ -8,7 +8,7 @@
 // Components
 import MyButton from './MyButton.vue';
 
-const numOrder = ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0' , '.']
+const numOrder = ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0']
 
 // const num = "5.4";
 // const res = Number(num) + .3;
@@ -24,7 +24,7 @@ const numOrder = ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0' , '.']
 #numericPad >:last-child {
     grid-row-start: 4;
 }
-#numericPad >:nth-last-child(2) {
-    grid-column: span 2;
+#numericPad >:nth-last-child(1) {
+    grid-column: span 3;
 }
 </style>

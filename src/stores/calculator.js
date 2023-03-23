@@ -33,6 +33,10 @@ class OperationState {
     sliceOperation(position) {
         this.operation = this.operation.slice(0, - position);
     };
+
+    isEmpty() {
+        return this.operation === "0" && this.result === "0";
+    };
 };
 
 export const useCalculator = defineStore('Calculator', {
@@ -43,7 +47,6 @@ export const useCalculator = defineStore('Calculator', {
         hasError: false,
         isFinished: false,
         isOperator: false,
-        isDecimal: false,
         lastInput: "",
     }),
     actions: {
@@ -73,7 +76,6 @@ export const useCalculator = defineStore('Calculator', {
                 case /[+\-*/%.]/.test(item):
                     this.updateOperation(item);
                     this.setLastInput(item);
-                    // this.isDecimal = item === ".";
                     break;
             };
         },
@@ -119,8 +121,7 @@ export const useCalculator = defineStore('Calculator', {
                 else {
                     this.current.sliceOperation(1);
 
-                    if (this.current.getCharacterFromBehind(1) === ".") this.current.sliceOperation(1);
-                    else if (this.current.getCharacterFromBehind(1) === " ") this.deleteOperator();
+                    if (this.current.getCharacterFromBehind(1) === " ") this.deleteOperator();
                 };
                 this.calc(this.current.operation);
             };
@@ -130,9 +131,10 @@ export const useCalculator = defineStore('Calculator', {
             this.current.sliceOperation(3);
         },
         clear(item){
-            if (this.lastInput === item) this.$reset()
+            if (this.lastInput === item || this.current.isEmpty()) this.$reset();
             else {
                 this.current.reset();
+                this.setBuffer();
             }
         },
         saveOperation(){
@@ -149,17 +151,7 @@ export const useCalculator = defineStore('Calculator', {
 
                 this.current.operation = this.lastOperation;
 
-                // console.log(isNaN(this.lastInput))
-                // if (item != ".") {
-                //     this.current.operation += ` ${item} `;
-                // } else if (!this.isDecimal && !/[+\-*/%]/.test(this.lastInput)) {
-                //     this.current.operation += item;
-                // }
-
-                this.current.operation += 
-                item === "." ?
-                item :
-                ` ${item} `;
+                this.current.operation += ` ${item} `;
             };
         }
     },
