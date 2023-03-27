@@ -2,8 +2,6 @@
   <section id="calculator">
     <div id="results">
       <div id="previous">
-        <!-- <p v-html="last.operation"/>
-        <p v-html="`= ${last.result}`"/> -->
         <template v-for="lastResult in lastArray">
           <p v-html="lastResult.operation"/>
           <p v-html="`= ${lastResult.result}`"/>
@@ -23,9 +21,6 @@
         <MyButton v-for="control in basicOperators" :item="control"/>
       </div>
     </div>
-    <!-- <div id="calcPad">
-      <MyButton v-for="control in calcButtons" :item="control"/>
-    </div> -->
   </section>
 </template>
 
@@ -38,18 +33,15 @@ import MyButton from './MyButton.vue';
 import {useCalculator} from '@/stores/calculator';
 import { storeToRefs } from 'pinia';
 
-const calcButtons = [
-  'C', 'backspace', '%', '/',
-  '7', '8', '9', '*',
-  '4', '5', '6', '-',
-  '1', '2', '3', '+',
-  '0', '.', '='
-]
-
 const specialOperators = ['C', 'backspace', '%']
 const basicOperators = ['/', '*', '-', '+', '=']
 
-const {last, lastArray, current, saveOperation} = storeToRefs(useCalculator());
+const {lastArray, current, saveOperation} = storeToRefs(useCalculator());
+
+const expresion = "3+4/5-6%";
+const expresionConEspacios = expresion.replace(/([\+\-\*\/\%])/g, " $1 ");
+console.log(expresionConEspacios); // "3 + 4 / 5 - 6 %"
+
 </script>
 
 <style>
@@ -63,7 +55,7 @@ const {last, lastArray, current, saveOperation} = storeToRefs(useCalculator());
 
 #results {
   display: grid;
-  grid-template-rows: 2fr 1fr;
+  grid-template-rows: 3fr 1fr;
 }
 
 #results p {
