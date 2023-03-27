@@ -102,20 +102,6 @@ export const useCalculator = defineStore('Calculator', {
             }
             else this.calc();
         },
-        calc(){
-            this.setBuffer();
-            this.current.calc();
-        },
-        setLastInput(item){
-            this.lastInput = item;
-            this.isOperator = isNaN(item);
-        },
-        setBuffer(position){
-            this.lastOperation = 
-            position != undefined ? 
-            this.current.sliceOperation(position) :
-            this.current.getOperation;
-        },
         backspace(){
             const length = this.current.getOperationLength;
             const lastChar = this.current.getCharacterFromBehind(1);
@@ -135,25 +121,12 @@ export const useCalculator = defineStore('Calculator', {
             };
             this.setLastInput(this.current.getCharacterFromBehind(1));
         },
-        deleteOperator() {
-            this.current.sliceOperation(3);
-        },
         clear(item){
             if (this.lastInput === item || this.current.isEmpty()) this.$reset();
             else {
                 this.current.reset();
                 this.setBuffer();
             }
-        },
-        saveOperation(){
-            if (this.lastArray.length >= 3) this.lastArray.shift();
-            
-            this.lastArray.push({
-                operation: this.current.operation,
-                result: this.current.result
-            });
-
-            this.current.operation = this.current.result;
         },
         updateOperation(item){
             if (this.lastInput != item) {
@@ -163,6 +136,33 @@ export const useCalculator = defineStore('Calculator', {
 
                 this.current.operation += ` ${item} `;
             };
-        }
+        },
+        setLastInput(item){
+            this.lastInput = item;
+            this.isOperator = isNaN(item);
+        },
+        calc(){
+            this.setBuffer();
+            this.current.calc();
+        },
+        setBuffer(position){
+            this.lastOperation = 
+            position != undefined ? 
+            this.current.sliceOperation(position) :
+            this.current.getOperation;
+        },
+        deleteOperator() {
+            this.current.sliceOperation(3);
+        },
+        saveOperation(){
+            if (this.lastArray.length >= 3) this.lastArray.shift();
+
+            this.lastArray.push({
+                operation: this.current.operation,
+                result: this.current.result
+            });
+
+            this.current.operation = this.current.result;
+        },
     },
 })
