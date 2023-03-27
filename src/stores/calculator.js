@@ -2,31 +2,21 @@ import { defineStore } from 'pinia';
 
 class OperationState {
 //  Constructors
-    constructor() {
-        this.reset();
-    };
+    constructor() {this.reset();};
 
 //  Getters
-    get getOperation() {
-        return this.operation;
-    };
+    get getOperation() {return this.operation;};
 
-    get getOperationLength() {
-        return this.operation.length;
-    };
+    get getOperationLength() {return this.operation.length;};
 
-    getCharacterFromBehind(position) {
-        return this.operation.charAt(this.getOperationLength - position);
-    };
+    getCharacterFromBehind(position) {return this.operation.charAt(this.getOperationLength - position);};
 
-    get getResult() {
-        return this.result;
-    }
+    get getResult() {return this.result;}
 
 //  Setters
-    addNumber(item) {
-        this.operation === "0" ? this.operation = item : this.operation += item;
-    };
+    setOperation(item) {this.operation = item;};
+
+    setResult(item) {this.result = item;};
 
 //  Methods
     reset() {
@@ -34,17 +24,13 @@ class OperationState {
         this.result = "0";
     };
     
-    sliceOperation(position) {
-        this.operation = this.operation.slice(0, - position);
-    };
+    sliceOperation(position) {this.operation = this.operation.slice(0, - position);};
 
-    isEmpty() {
-        return this.operation === "0" && this.result === "0";
-    };
+    isEmpty() {return this.operation === "0" && this.result === "0";};
 
-    calc() {
-        this.result = `${eval(this.operation)}`;
-    };
+    calc(operation) {this.result = `${eval(operation || this.operation)}`;};
+
+    addItem(item) {this.operation === "0" ? this.setOperation(item) : this.operation += item;};
 };
 
 export const useCalculator = defineStore('Calculator', {
@@ -67,7 +53,7 @@ export const useCalculator = defineStore('Calculator', {
 
             switch (true) {
                 case /^\d+(\.\d+)?$/.test(item):
-                    this.addNumber(item);
+                    this.addItem(item);
                     this.setLastInput(item);
                     break;
                 case item === "backspace":
@@ -87,37 +73,47 @@ export const useCalculator = defineStore('Calculator', {
                     break;
             };
         },
-        addNumber(item){
+        addItem(item){
             if (this.isFinished) {
                 this.saveOperation();
                 this.clear();
             };
 
-            this.current.addNumber(item);
+            this.current.addItem(item);
 
             if (this.lastInput === "/" && item === "0") {
-                this.current.result = "No se puede dividir por cero";
+                this.current.setResult("No se puede dividir por cero");
 
                 this.hasError = true;
             }
             else this.calc();
         },
+        addOperator(item){
+            if (this.lastInput != item) {
+                if (this.isFinished) this.isFinished = false;
+
+                this.current.setOperation(this.lastOperation);
+                this.current.addItem(item);
+            };
+        },
         backspace(){
             const length = this.current.getOperationLength;
-            const lastChar = this.current.getCharacterFromBehind(1);
-
+            
             if (length <= 1) {
                 this.current.reset();
                 this.setBuffer();
             }
             else {
-                if (lastChar === " ") this.deleteOperator();
-                else {
-                    this.current.sliceOperation(1);
+                this.current.sliceOperation(1);
+                const lastChar = this.current.getCharacterFromBehind(1);
+                
+                if (/[+\-*/%.]/.test(lastChar)) {
+                    const operation = this.current.getOperation.slice(0, this.current.getOperationLength - 1);
 
-                    if (this.current.getCharacterFromBehind(1) === " ") this.deleteOperator();
-                };
-                this.calc();
+                    this.calc(operation);
+                    this.lastOperation = operation;
+                }
+                else this.calc();
             };
             this.setLastInput(this.current.getCharacterFromBehind(1));
         },
@@ -128,22 +124,13 @@ export const useCalculator = defineStore('Calculator', {
                 this.setBuffer();
             }
         },
-        addOperator(item){
-            if (this.lastInput != item) {
-                if (this.isFinished) this.isFinished = false;
-
-                this.current.operation = this.lastOperation;
-
-                this.current.operation += ` ${item} `;
-            };
-        },
         setLastInput(item){
             this.lastInput = item;
             this.isOperator = isNaN(item);
         },
-        calc(){
+        calc(operation){
             this.setBuffer();
-            this.current.calc();
+            this.current.calc(operation);
         },
         setBuffer(position){
             this.lastOperation = 
@@ -151,18 +138,13 @@ export const useCalculator = defineStore('Calculator', {
             this.current.sliceOperation(position) :
             this.current.getOperation;
         },
-        deleteOperator() {
-            this.current.sliceOperation(3);
-        },
         saveOperation(){
             if (this.lastArray.length >= 3) this.lastArray.shift();
 
             this.lastArray.push({
-                operation: this.current.operation,
-                result: this.current.result
+                operation: this.current.getOperation,
+                result: this.current.getResult
             });
-
-            this.current.operation = this.current.result;
         },
     },
 })
