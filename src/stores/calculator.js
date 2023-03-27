@@ -14,9 +14,9 @@ class OperationState {
     get getResult() {return this.result;}
 
 //  Setters
-    setOperation(item) {this.operation = item;};
+    setOperation(currentInput) {this.operation = currentInput;};
 
-    setResult(item) {this.result = item;};
+    setResult(currentInput) {this.result = currentInput;};
 
 //  Methods
     reset() {
@@ -30,7 +30,7 @@ class OperationState {
 
     calc(operation) {this.result = `${eval(operation || this.operation)}`;};
 
-    addItem(item) {this.operation === "0" ? this.setOperation(item) : this.operation += item;};
+    addcurrentInput(currentInput) {this.operation === "0" ? this.setOperation(currentInput) : this.operation += currentInput;};
 };
 
 export const useCalculator = defineStore('Calculator', {
@@ -44,7 +44,7 @@ export const useCalculator = defineStore('Calculator', {
         lastInput: "",
     }),
     actions: {
-        handleInput(item){
+        handleInput(currentInput){
             if (this.hasError) {
                 this.clear();
 
@@ -52,81 +52,80 @@ export const useCalculator = defineStore('Calculator', {
             };
 
             switch (true) {
-                case /^\d+(\.\d+)?$/.test(item):
-                    this.addItem(item);
-                    this.setLastInput(item);
+                case /^\d+(\.\d+)?$/.test(currentInput):
+                    this.addNumber(currentInput);
                     break;
-                case item === "backspace":
+                case currentInput === "backspace":
                     this.backspace();
                     break;
-                case item === "C":
-                    this.clear(item);
-                    this.setLastInput(item);
+                case currentInput === "C":
+                    this.clear(currentInput);
                     break;
-                case item === "=" && !this.isOperator:
+                case currentInput === "=" && !this.isOperator:
                     this.isFinished = true;
-                    this.setLastInput(item);
                     break;
-                case /[+\-*/%.]/.test(item):
-                    this.addOperator(item);
-                    this.setLastInput(item);
+                case /[+\-*/%.]/.test(currentInput):
+                    this.addOperator(currentInput);
                     break;
             };
         },
-        addItem(item){
-            if (this.isFinished) {
+        addNumber(currentInput){
+            if (this.isFinished && isNaN(this.current.getOperation)) {
                 this.saveOperation();
                 this.clear();
             };
 
-            this.current.addItem(item);
+            this.current.addcurrentInput(currentInput);
 
-            if (this.lastInput === "/" && item === "0") {
+            this.isFinished = false;
+
+            if (this.lastInput === "/" && currentInput === "0") {
                 this.current.setResult("No se puede dividir por cero");
 
                 this.hasError = true;
             }
             else this.calc();
+
+            this.setLastInput(currentInput);
         },
-        addOperator(item){
-            if (this.lastInput != item) {
+        addOperator(currentInput){
+            if (this.current.getOperation != 0 && this.lastInput != currentInput) {
                 if (this.isFinished) this.isFinished = false;
 
                 this.current.setOperation(this.lastOperation);
-                this.current.addItem(item);
+                this.current.addcurrentInput(currentInput);
+
+                this.setLastInput(currentInput);
             };
         },
         backspace(){
-            const length = this.current.getOperationLength;
-            
-            if (length <= 1) {
-                this.current.reset();
-                this.setBuffer();
-            }
-            else {
+            if (this.current.getOperationLength > 1) {
                 this.current.sliceOperation(1);
                 const lastChar = this.current.getCharacterFromBehind(1);
                 
                 if (/[+\-*/%.]/.test(lastChar)) {
                     const operation = this.current.getOperation.slice(0, this.current.getOperationLength - 1);
-
+    
                     this.calc(operation);
                     this.lastOperation = operation;
                 }
                 else this.calc();
-            };
-            this.setLastInput(this.current.getCharacterFromBehind(1));
+    
+                this.setLastInput(this.current.getCharacterFromBehind(1));
+            }
+            else this.clear();
         },
-        clear(item){
-            if (this.lastInput === item || this.current.isEmpty()) this.$reset();
+        clear(currentInput){
+            if (this.lastInput === currentInput || this.current.isEmpty()) this.$reset();
             else {
                 this.current.reset();
                 this.setBuffer();
+                this.setLastInput(currentInput || "");
             }
         },
-        setLastInput(item){
-            this.lastInput = item;
-            this.isOperator = isNaN(item);
+        setLastInput(currentInput){
+            this.lastInput = currentInput;
+            this.isOperator = isNaN(currentInput);
         },
         calc(operation){
             this.setBuffer();

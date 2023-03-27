@@ -3,13 +3,13 @@
     <div id="results">
       <div id="previous">
         <template v-for="lastResult in lastArray">
-          <p v-html="lastResult.operation.replace(/([\+\-\*\/\%])/g, ' $1 ')"/>
+          <p v-html="addWhitespaces(lastResult.operation)"/>
           <p v-html="`= ${lastResult.result}`"/>
         </template>
       </div>
       <div id="current">
-        <p :class="{focus:!saveOperation}" v-html="current.operation.replace(/([\+\-\*\/\%])/g, ' $1 ')"/>
-        <p :class="{focus:saveOperation}" v-html="`= ${current.result}`"/>
+        <p :class="{focus:!isFinished}" v-html="addWhitespaces(current.operation)"/>
+        <p :class="{focus:isFinished}" v-html="`= ${current.result}`"/>
       </div>
     </div>
     <div id="calculatorPad">
@@ -36,8 +36,11 @@ import { storeToRefs } from 'pinia';
 const specialOperators = ['C', 'backspace', '%']
 const basicOperators = ['/', '*', '-', '+', '=']
 
-const {lastArray, current, saveOperation} = storeToRefs(useCalculator());
+const {lastArray, current, isFinished} = storeToRefs(useCalculator());
 
+function addWhitespaces(operation) {
+  return operation.replace(/([\+\-\*\/\%])/g, ' $1 ');
+};
 </script>
 
 <style>
@@ -51,12 +54,25 @@ const {lastArray, current, saveOperation} = storeToRefs(useCalculator());
 
 #results {
   display: grid;
-  grid-template-rows: 3fr 1fr;
+  grid-template-rows: 2fr 1fr;
 }
 
 #results p {
   margin: auto 2rem auto auto;
   text-align: end;
+}
+
+#results #current {
+  padding-top: .25rem;
+}
+
+#results .focus {
+  font-size: larger;
+}
+
+#results #previous {
+  font-size: small;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
 }
 
 #calculatorPad {

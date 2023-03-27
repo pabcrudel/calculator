@@ -1,5 +1,9 @@
 <template>
-  <button class="myButton" :class="{'material-symbols-outlined': item === 'backspace'}" v-html="item" @click="useCalculator().handleInput(item)"/>
+  <button 
+    class="myButton" :class="{'material-symbols-outlined': item === 'backspace'}" 
+    @click="useCalculator().handleInput(item)"
+    v-html="item" 
+  />
 </template>
 
 <script setup>
@@ -12,10 +16,5 @@ defineProps({
 </script>
 
 <style scoped>
-button {
-  font-size: 1.75rem;
-  /* border-radius: 50%;
-  width: 50px;
-  height: 50px; */
-}
+button {font-size: 1.75rem;}
 </style>
