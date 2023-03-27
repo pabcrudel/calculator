@@ -3,12 +3,12 @@
     <div id="results">
       <div id="previous">
         <template v-for="lastResult in lastArray">
-          <p v-html="lastResult.operation"/>
+          <p v-html="lastResult.operation.replace(/([\+\-\*\/\%])/g, ' $1 ')"/>
           <p v-html="`= ${lastResult.result}`"/>
         </template>
       </div>
       <div id="current">
-        <p :class="{focus:!saveOperation}" v-html="current.operation"/>
+        <p :class="{focus:!saveOperation}" v-html="current.operation.replace(/([\+\-\*\/\%])/g, ' $1 ')"/>
         <p :class="{focus:saveOperation}" v-html="`= ${current.result}`"/>
       </div>
     </div>
@@ -37,10 +37,6 @@ const specialOperators = ['C', 'backspace', '%']
 const basicOperators = ['/', '*', '-', '+', '=']
 
 const {lastArray, current, saveOperation} = storeToRefs(useCalculator());
-
-const expresion = "3+4/5-6%";
-const expresionConEspacios = expresion.replace(/([\+\-\*\/\%])/g, " $1 ");
-console.log(expresionConEspacios); // "3 + 4 / 5 - 6 %"
 
 </script>
 
