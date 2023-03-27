@@ -24,7 +24,7 @@ class OperationState {
     }
 
 //  Setters
-    setOperation(item) {
+    addNumber(item) {
         this.operation === "0" ? this.operation = item : this.operation += item;
     };
 
@@ -67,7 +67,7 @@ export const useCalculator = defineStore('Calculator', {
 
             switch (true) {
                 case /^\d+(\.\d+)?$/.test(item):
-                    this.setOperation(item);
+                    this.addNumber(item);
                     this.setLastInput(item);
                     break;
                 case item === "backspace":
@@ -82,18 +82,18 @@ export const useCalculator = defineStore('Calculator', {
                     this.setLastInput(item);
                     break;
                 case /[+\-*/%.]/.test(item):
-                    this.updateOperation(item);
+                    this.addOperator(item);
                     this.setLastInput(item);
                     break;
             };
         },
-        setOperation(item){
+        addNumber(item){
             if (this.isFinished) {
                 this.saveOperation();
                 this.clear();
             };
 
-            this.current.setOperation(item);
+            this.current.addNumber(item);
 
             if (this.lastInput === "/" && item === "0") {
                 this.current.result = "No se puede dividir por cero";
@@ -128,7 +128,7 @@ export const useCalculator = defineStore('Calculator', {
                 this.setBuffer();
             }
         },
-        updateOperation(item){
+        addOperator(item){
             if (this.lastInput != item) {
                 if (this.isFinished) this.isFinished = false;
 
