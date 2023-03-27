@@ -7,17 +7,21 @@ class OperationState {
     };
 
 //  Getters
-    getOperation() {
+    get getOperation() {
         return this.operation;
     };
 
-    getOperationLength() {
+    get getOperationLength() {
         return this.operation.length;
     };
 
     getCharacterFromBehind(position) {
-        return this.operation.charAt(this.getOperationLength() - position);
+        return this.operation.charAt(this.getOperationLength - position);
     };
+
+    get getResult() {
+        return this.result;
+    }
 
 //  Setters
     setOperation(item) {
@@ -36,6 +40,10 @@ class OperationState {
 
     isEmpty() {
         return this.operation === "0" && this.result === "0";
+    };
+
+    calc() {
+        this.result = `${eval(this.operation)}`;
     };
 };
 
@@ -92,11 +100,11 @@ export const useCalculator = defineStore('Calculator', {
 
                 this.hasError = true;
             }
-            else this.calc(this.current.operation);
+            else this.calc();
         },
-        calc(operation){
+        calc(){
             this.setBuffer();
-            this.current.result = `${eval(operation)}`;
+            this.current.calc();
         },
         setLastInput(item){
             this.lastInput = item;
@@ -105,11 +113,11 @@ export const useCalculator = defineStore('Calculator', {
         setBuffer(position){
             this.lastOperation = 
             position != undefined ? 
-            this.current.operation.slice(0, - position) :
-            this.current.getOperation();
+            this.current.sliceOperation(position) :
+            this.current.getOperation;
         },
         backspace(){
-            const length = this.current.getOperationLength();
+            const length = this.current.getOperationLength;
             const lastChar = this.current.getCharacterFromBehind(1);
 
             if (length <= 1) {
@@ -123,7 +131,7 @@ export const useCalculator = defineStore('Calculator', {
 
                     if (this.current.getCharacterFromBehind(1) === " ") this.deleteOperator();
                 };
-                this.calc(this.current.operation);
+                this.calc();
             };
             this.setLastInput(this.current.getCharacterFromBehind(1));
         },
@@ -138,6 +146,8 @@ export const useCalculator = defineStore('Calculator', {
             }
         },
         saveOperation(){
+            if (this.lastArray.length >= 3) this.lastArray.shift();
+            
             this.lastArray.push({
                 operation: this.current.operation,
                 result: this.current.result
