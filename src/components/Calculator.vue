@@ -3,13 +3,13 @@
     <div id="results">
       <div id="previous">
         <template v-for="lastResult in lastArray">
-          <p v-html="addWhitespaces(lastResult.operation)"/>
-          <p v-html="`= ${lastResult.result}`"/>
+          <p v-html="lastResult.showOperation"/>
+          <p v-html="lastResult.showResult"/>
         </template>
       </div>
       <div id="current">
-        <p :class="{focus:!isFinished}" v-html="addWhitespaces(current.operation)"/>
-        <p :class="{focus:isFinished}" v-html="`= ${current.result}`"/>
+        <p :class="{focus:!isFinished}" v-html="current.showOperation"/>
+        <p :class="{focus:isFinished}" v-html="current.showResult"/>
       </div>
     </div>
     <div id="calculatorPad">
@@ -37,10 +37,6 @@ const specialOperators = ['C', 'backspace', '%']
 const basicOperators = ['/', '*', '-', '+', '=']
 
 const {lastArray, current, isFinished} = storeToRefs(useCalculator());
-
-function addWhitespaces(operation) {
-  return operation.replace(/([\+\-\*\/\%])/g, ' $1 ');
-};
 </script>
 
 <style>
